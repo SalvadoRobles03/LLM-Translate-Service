@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "xD4XWY5gMx4=",
+  "success": true,
+  "projectFilePath": "/Users/salvadorobles03/Documents/School/Aplicaciones Avanzadas/LLM-Translate-Service/LLMTranslateService/src/LLMTranslateService.Api/LLMTranslateService.Api.csproj",
+  "expectedPackageFiles": [
+    "/Users/salvadorobles03/.nuget/packages/microsoft.aspnetcore.openapi/9.0.3/microsoft.aspnetcore.openapi.9.0.3.nupkg.sha512",
+    "/Users/salvadorobles03/.nuget/packages/microsoft.openapi/1.6.17/microsoft.openapi.1.6.17.nupkg.sha512",
+    "/Users/salvadorobles03/.nuget/packages/microsoft.visualstudio.azure.containers.tools.targets/1.21.0/microsoft.visualstudio.azure.containers.tools.targets.1.21.0.nupkg.sha512"
+  ],
+  "logs": []
+}
