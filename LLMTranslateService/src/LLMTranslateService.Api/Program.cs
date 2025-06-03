@@ -7,12 +7,12 @@ using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddHttpClient<ITranslationService, TranslationService>();
+builder.Configuration.AddJsonFile("appsettings.Local.json", optional: false, reloadOnChange: true);
 
+builder.Services.AddHttpClient<ITranslationService, TranslationService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
-
 builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new AuthorizeFilter());
@@ -29,8 +29,17 @@ app.Run();
 
 public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
-    public BasicAuthHandler(IOptionsMonitor<AuthenticationSchemeOptions> options, ILoggerFactory logger, System.Text.Encodings.Web.UrlEncoder encoder)
-        : base(options, logger, encoder) { }
+    private readonly IConfiguration _configuration;
+
+    public BasicAuthHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options,
+        ILoggerFactory logger,
+        System.Text.Encodings.Web.UrlEncoder encoder,
+        IConfiguration configuration)
+        : base(options, logger, encoder)
+    {
+        _configuration = configuration;
+    }
 
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -55,7 +64,10 @@ public class BasicAuthHandler : AuthenticationHandler<AuthenticationSchemeOption
             var username = credentials[0];
             var password = credentials[1];
 
-            if (username != "admin" || password != "password")
+            var validUsername = _configuration["BasicAuth:Username"];
+            var validPassword = _configuration["BasicAuth:Password"];
+
+            if (username != validUsername || password != validPassword)
                 return Task.FromResult(AuthenticateResult.Fail("Invalid Username or Password"));
 
             var claims = new[] { new Claim(ClaimTypes.Name, username) };

@@ -1,6 +1,7 @@
 using LLMTranslateService.Api.Models;
 using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 
 namespace LLMTranslateService.Api.Services
 {
@@ -12,10 +13,12 @@ namespace LLMTranslateService.Api.Services
     public class TranslationService : ITranslationService
     {
         private readonly HttpClient _httpClient;
+        private readonly string _endpointUrl;
 
-        public TranslationService(HttpClient httpClient)
+        public TranslationService(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
+            _endpointUrl = configuration["TranslationService:Endpoint"] ?? throw new ArgumentNullException("TranslationService:Endpoint configuration is missing.");
         }
 
         public TranslationResponse Translate(TranslationRequest request)
@@ -23,7 +26,7 @@ namespace LLMTranslateService.Api.Services
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = _httpClient.PostAsync("http://localhost:8000/generate", content).Result;
+            var response = _httpClient.PostAsync(_endpointUrl, content).Result;
             var responseBody = response.Content.ReadAsStringAsync().Result;
 
             List<string>? translatedStrings = null;
