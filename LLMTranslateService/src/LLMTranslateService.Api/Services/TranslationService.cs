@@ -1,7 +1,4 @@
 using LLMTranslateService.Api.Models;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 
@@ -26,15 +23,30 @@ namespace LLMTranslateService.Api.Services
             var json = JsonSerializer.Serialize(request);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = _httpClient.PostAsync("https://api.otroservicio.com/translate", content).Result;
+            var response = _httpClient.PostAsync("http://localhost:8000/generate", content).Result;
             var responseBody = response.Content.ReadAsStringAsync().Result;
 
-            var translatedResponse = JsonSerializer.Deserialize<TranslationResponse>(responseBody);
+            List<string>? translatedStrings = null;
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(responseBody) && responseBody.TrimStart().StartsWith("["))
+                {
+                    translatedStrings = JsonSerializer.Deserialize<List<string>>(responseBody);
+                }
+            }
+            catch (JsonException)
+            {
+                translatedStrings = new List<string>();
+            }
 
-            return translatedResponse ?? new TranslationResponse
+            var messages = translatedStrings != null
+                ? translatedStrings.Select(msg => new TranslationMessage { Message = msg }).ToList()
+                : new List<TranslationMessage>();
+
+            return new TranslationResponse
             {
                 Language = request.Language,
-                Messages = new List<TranslationMessage>()
+                Messages = messages
             };
         }
     }

@@ -1,20 +1,32 @@
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
+
 namespace LLMTranslateService.Api.Models
 {
     public class TranslationMessage
     {
-        public string Message { get; set; }
+        [JsonPropertyName("message")]
+        public required string Message { get; set; }
     }
 
     public class TranslationRequest
     {
-        public string SourceLanguage { get; set; }
-        public string Language { get; set; }
-        public List<TranslationMessage> Messages { get; set; }
+        [JsonPropertyName("SourceLanguage")]
+        public required string SourceLanguage { get; set; }
+
+        [JsonPropertyName("language")]
+        public required string Language { get; set; }
+
+        [JsonPropertyName("Messages")]
+        public required List<TranslationMessage> Messages { get; set; }
     }
 
     public class TranslationResponse
     {
-        public string Language { get; set; }
-        public List<TranslationMessage> Messages { get; set; }
+        [JsonPropertyName("language")]
+        public required string Language { get; set; }
+
+        [JsonPropertyName("Messages")]
+        public required List<TranslationMessage> Messages { get; set; }
     }
 }
