@@ -16,7 +16,7 @@ namespace LLMTranslateService.Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult Translate([FromBody] TranslationRequest request)
+        public async Task<IActionResult> Translate([FromBody] TranslationRequest request)
         {
             if (request == null ||
                 string.IsNullOrWhiteSpace(request.SourceLanguage) ||
@@ -26,7 +26,21 @@ namespace LLMTranslateService.Api.Controllers
                 return BadRequest("Bad Request");
             }
 
-            var response = _translationService.Translate(request);
+            var response = await _translationService.TranslateAsync(request);
+            return Ok(response);
+        }
+        [HttpPost("force-translate")]
+        public async Task<IActionResult> ForceTranslate([FromBody] TranslationRequest request)
+        {
+            if (request == null ||
+                string.IsNullOrWhiteSpace(request.SourceLanguage) ||
+                string.IsNullOrWhiteSpace(request.Language) ||
+                request.Messages == null || request.Messages.Count == 0)
+            {
+                return BadRequest("Bad Request");
+            }
+
+            var response = await _translationService.ForceTranslateAsync(request);
             return Ok(response);
         }
     }

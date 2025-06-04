@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.Caching.Distributed;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddJsonFile("appsettings.Local.json", optional: false, reloadOnChange: true);
@@ -17,6 +18,16 @@ builder.Services.AddControllers(options =>
 {
     options.Filters.Add(new AuthorizeFilter());
 });
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = builder.Configuration.GetConnectionString("Redis");
+    options.InstanceName = "LLMTranslateService_";
+});
+
+builder.Services.AddHttpClient<ITranslationService, TranslationService>();
+builder.Services.AddScoped<ITranslationService, TranslationService>();
+
 
 var app = builder.Build();
 
